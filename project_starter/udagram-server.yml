@@ -46,19 +46,36 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
-
+  RoleS3BucketReadOnly:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+              - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+      Policies:
+        - PolicyName: S3ReadOnly
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 's3:Get*'
+                Resource: "*"
+  InstanceProfileS3ReadOnly:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Path: '/'
+      Roles: 
+        - !Ref RoleS3BucketReadOnly
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      AssociatePublicIpAddress: true
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          sudo apt-get update -y
-          sudo apt-get install apache2 -y
-          sudo systemctl start apache2.service  
-          cd /var/www/html
-          echo "Udacity Demo Web Server Up and Running!" > index.html        
+      IamInstanceProfile: !Ref InstanceProfileS3ReadOnly
       ImageId: ami-08fdec01f5df9998f
       KeyName: udagram_kay_pair
       SecurityGroups:
@@ -68,6 +85,16 @@ Resources:
       - DeviceName: "/dev/sdk"
         Ebs:
           VolumeSize: '10'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt-get update -y
+          sudo apt-get install unzip awscli apache2 -y
+          sudo systemctl start apache2.service
+          sudo rm /var/www/html/index.html
+          sudo aws s3 cp s3://udagram-944897143334/travelapp.zip /var/www/html
+          sudo unzip /var/www/html/travelapp.zip -d /var/www/html  
+          systemctl restart apache2.service
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -80,7 +107,6 @@ Resources:
       MaxSize: '4'
       TargetGroupARNs:
       - Ref: WebAppTargetGroup
-
   WebAppLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -125,3 +151,7 @@ Resources:
       VpcId: 
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
+Outputs:
+  WebAppLBDNSName:
+    Description: The DNSName of the load balancer
+    Value: !GetAtt WebAppLB.DNSName
