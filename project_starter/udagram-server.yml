@@ -154,4 +154,4 @@ Resources:
 Outputs:
   WebAppLBDNSName:
     Description: The DNSName of the load balancer
-    Value: !GetAtt WebAppLB.DNSName
+    Value: !Join ['', ['http://', !GetAtt WebAppLB.DNSName ]]
