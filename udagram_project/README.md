@@ -15,3 +15,15 @@ JSON file for increasing the generic nature of the YAML code. For example, the J
 JSON file for increasing the generic nature of the YAML code.
 
 In YAML code, the `${EnvironmentName}` would be substituted with `UdagramProject` accordingly.
+
+### How to run the Cloudformation?
+You can run it in two easy steps:
+```bash
+# Ensure that the AWS CLI is configured before runniing the command below
+# Create the network infrastructure
+# Check the region in the create.sh file
+./create.sh myFirstStack udagram-network.yml network-params.json
+# Create servers
+# Change the AMI ID and key-pair name in the servers.yml
+# Check the region in the update.sh file
+./update.sh mySecStack udagram-server.yml server-params.json
