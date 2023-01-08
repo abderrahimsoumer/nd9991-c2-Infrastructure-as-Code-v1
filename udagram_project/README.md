@@ -1,6 +1,8 @@
 ### Project Title - Deploy a high-availability web app using CloudFormation
 This folder provides the code for the "ND9991 - C2- Infrastructure as Code - Deploy a high-availability web app using CloudFormation" project. This folder contains the following files:
 
+### APP URL
+http://udagr-webap-e4w9egvzh9re-779544370.us-east-1.elb.amazonaws.com/
 
 #### Udagram-network.yml
 the CloudFormation code using this YAML template for building the network infrastructuret including: VPC, Subnets, InternetGateway, NatGatway, RouteTable... 
