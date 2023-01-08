@@ -77,7 +77,6 @@ Resources:
     Properties:
       IamInstanceProfile: !Ref InstanceProfileS3ReadOnly
       ImageId: ami-08fdec01f5df9998f
-      KeyName: udagram_kay_pair
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: t2.medium
